@@ -1,34 +1,105 @@
-```html
-<!doctype html>
-<html lang="zh">
+<!DOCTYPE html>
+<html lang="zh-Hans">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>欢迎来到 Xiao Shi Dai 的网站</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 50px;
-      background-color: #f9f9f9;
-    }
-    h1 {
-      color: #333;
-    }
-    p {
-      color: #666;
-    }
-    a {
-      color: #007acc;
-      text-decoration: none;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日式餐厅菜单</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Microsoft YaHei", sans-serif;
+            background: url('poster.png') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+        }
+        .overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+            min-height: 100vh;
+            padding: 40px;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        header h1 {
+            font-size: 3rem;
+            margin: 0;
+            color: #FFD700;
+        }
+        .menu {
+            max-width: 800px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.8);
+            color: #000;
+            border-radius: 15px;
+            padding: 30px;
+        }
+        .menu h2 {
+            border-bottom: 2px solid #d4af37;
+            padding-bottom: 10px;
+            margin-top: 0;
+            color: #b22222;
+        }
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #999;
+        }
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+        .name {
+            font-weight: bold;
+        }
+        .price {
+            color: #b22222;
+        }
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 0.9rem;
+            color: #ddd;
+        }
+    </style>
 </head>
 <body>
-  <h1>你好，世界！</h1>
-  <p>这是 Xiao Shi Dai 在 GitHub Pages 上托管的第一个免费网站。</p>
-  <p>你现在访问的是 <strong>https://xiaoshidai.github.io</strong></p>
-  <p>更多内容即将上线，敬请期待！</p>
+    <div class="overlay">
+        <header>
+            <h1>樱花居酒屋菜单</h1>
+        </header>
+        <div class="menu">
+            <h2>主食</h2>
+            <div class="menu-item">
+                <span class="name">寿司拼盘</span>
+                <span class="price">RM 45</span>
+            </div>
+            <div class="menu-item">
+                <span class="name">三文鱼刺身</span>
+                <span class="price">RM 38</span>
+            </div>
+            <div class="menu-item">
+                <span class="name">照烧鸡肉饭</span>
+                <span class="price">RM 22</span>
+            </div>
+            <h2>饮品</h2>
+            <div class="menu-item">
+                <span class="name">抹茶拿铁</span>
+                <span class="price">RM 12</span>
+            </div>
+            <div class="menu-item">
+                <span class="name">梅子酒</span>
+                <span class="price">RM 18</span>
+            </div>
+            <div class="menu-item">
+                <span class="name">柚子茶</span>
+                <span class="price">RM 10</span>
+            </div>
+        </div>
+        <footer>
+            © 2025 樱花居酒屋 | 日式料理の味
+        </footer>
+    </div>
 </body>
 </html>
-```
