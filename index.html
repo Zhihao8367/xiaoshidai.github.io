@@ -1,105 +1,223 @@
+<!-- Save this HTML and put fuji.jpg in the same folder -->
 <!DOCTYPE html>
 <html lang="zh-Hans">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>日式餐厅菜单</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: "Microsoft YaHei", sans-serif;
-            background: url('poster.png') no-repeat center center fixed;
-            background-size: cover;
-            color: #fff;
-        }
-        .overlay {
-            background-color: rgba(0, 0, 0, 0.5);
-            min-height: 100vh;
-            padding: 40px;
-        }
-        header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        header h1 {
-            font-size: 3rem;
-            margin: 0;
-            color: #FFD700;
-        }
-        .menu {
-            max-width: 800px;
-            margin: auto;
-            background: rgba(255, 255, 255, 0.8);
-            color: #000;
-            border-radius: 15px;
-            padding: 30px;
-        }
-        .menu h2 {
-            border-bottom: 2px solid #d4af37;
-            padding-bottom: 10px;
-            margin-top: 0;
-            color: #b22222;
-        }
-        .menu-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px dashed #999;
-        }
-        .menu-item:last-child {
-            border-bottom: none;
-        }
-        .name {
-            font-weight: bold;
-        }
-        .price {
-            color: #b22222;
-        }
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            font-size: 0.9rem;
-            color: #ddd;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>小食代手冲馆 · 互动多语菜单</title>
+  <style>
+    :root{
+      --gold:#d4af37; --crimson:#b22222; --ink:#111; --wash:#ffffffcc; --bgdark:rgba(0,0,0,.55);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Microsoft YaHei",sans-serif;
+      color:#fff;overflow-x:hidden;background:#000;
+    }
+    .bg{
+      position:fixed; inset:0; z-index:-2; overflow:hidden;
+    }
+    .bg img{ position:absolute; width:100%; height:100%; object-fit:cover; opacity:0; transition:opacity 1.6s ease; filter:saturate(1.05) contrast(1.05); }
+    .bg img.active{ opacity:1; }
+    .overlay{ position:relative; min-height:100vh; background:var(--bgdark); padding:24px; }
+
+    header{ text-align:center; margin:12px 0 18px; }
+    header h1{ margin:0; font-size:clamp(24px,5vw,44px); color:#FFD700; letter-spacing:2px; }
+    header p{ margin:.25rem 0 0; opacity:.9 }
+
+    .toolbar{
+      max-width:1100px; margin:0 auto 14px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:center;
+    }
+    .toolbar .card{
+      background:rgba(255,255,255,.85); color:#000; border-radius:14px; padding:10px 12px; display:flex; gap:12px; align-items:center; flex-wrap:wrap;
+      box-shadow:0 6px 20px rgba(0,0,0,.25);
+    }
+    .toolbar select, .toolbar button, .toolbar input[type="file"], .toolbar input[type="text"]{
+      appearance:none; border:1px solid #ccc; border-radius:10px; padding:8px 10px; background:#fff; color:#000; font-weight:600;
+    }
+    .toolbar button{ cursor:pointer; background:var(--gold); border-color:#b9962a; color:#111; }
+    .toolbar button.secondary{ background:#eee; border-color:#ddd; color:#222; }
+    .toolbar button.danger{ background:#ffdddd; border-color:#e8b2b2; color:#8b0000; }
+
+    .menu{ max-width:1100px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; }
+    .category-title{ grid-column:1/-1; background:rgba(255,255,255,.9); color:#000; border-left:6px solid var(--gold); border-radius:12px; padding:10px 14px; font-weight:800; letter-spacing:.5px; }
+
+    .card-item{ background:rgba(255,255,255,.9); color:#000; border-radius:16px; overflow:hidden; box-shadow:0 10px 22px rgba(0,0,0,.25); display:flex; flex-direction:column; }
+    .thumb{ width:100%; aspect-ratio:4/3; background:#ddd; position:relative; overflow:hidden; }
+    .thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+    .badge{ position:absolute; right:8px; top:8px; background:#000; color:#fff; padding:4px 8px; border-radius:999px; font-size:.75rem; opacity:.85 }
+    .content{ padding:12px 14px; display:flex; flex-direction:column; gap:8px; }
+    .title{ font-weight:800; font-size:1.05rem; }
+    .subtitle{ font-size:.9rem; opacity:.8 }
+    .price{ color:var(--crimson); font-weight:900; font-size:1.1rem; }
+    .actions{ display:flex; gap:8px; margin-top:auto; }
+    .actions button{ flex:1; border:none; border-radius:10px; padding:8px 10px; cursor:pointer; font-weight:700; }
+    .actions .edit{ background:#f3f3f3 }
+    .actions .delete{ background:#ffe5e5; color:#8b0000 }
+
+    footer{ text-align:center; margin:22px 0 8px; font-size:.95rem; color:#ddd; }
+
+    dialog{ border:none; border-radius:16px; max-width:720px; width:95%; padding:0; box-shadow:0 20px 60px rgba(0,0,0,.5); }
+    .modal-head{ padding:14px 18px; background:#111; color:#fff; display:flex; justify-content:space-between; align-items:center; }
+    .modal-body{ padding:14px 18px; background:#fff; color:#000; }
+    .grid{ display:grid; gap:12px; grid-template-columns:repeat(12,1fr); }
+    .g-6{ grid-column:span 6 } .g-12{ grid-column:span 12 } .g-4{ grid-column:span 4 } .g-8{ grid-column:span 8 }
+    .modal-body input, .modal-body select, .modal-body textarea{ width:100%; padding:10px; border:1px solid #ccc; border-radius:10px; }
+    .modal-foot{ padding:14px 18px; background:#fafafa; display:flex; gap:10px; justify-content:flex-end; border-top:1px solid #eee; }
+    .pill{ padding:6px 10px; border-radius:999px; background:#eee; border:1px solid #ddd; display:inline-flex; gap:8px; align-items:center; }
+
+    @media (max-width:640px){ .grid{ grid-template-columns:repeat(6,1fr) } .g-6{ grid-column:span 6 } .g-4{ grid-column:span 6 } .g-8{ grid-column:span 6 } }
+  </style>
 </head>
 <body>
-    <div class="overlay">
-        <header>
-            <h1>樱花居酒屋菜单</h1>
-        </header>
-        <div class="menu">
-            <h2>主食</h2>
-            <div class="menu-item">
-                <span class="name">寿司拼盘</span>
-                <span class="price">RM 45</span>
-            </div>
-            <div class="menu-item">
-                <span class="name">三文鱼刺身</span>
-                <span class="price">RM 38</span>
-            </div>
-            <div class="menu-item">
-                <span class="name">照烧鸡肉饭</span>
-                <span class="price">RM 22</span>
-            </div>
-            <h2>饮品</h2>
-            <div class="menu-item">
-                <span class="name">抹茶拿铁</span>
-                <span class="price">RM 12</span>
-            </div>
-            <div class="menu-item">
-                <span class="name">梅子酒</span>
-                <span class="price">RM 18</span>
-            </div>
-            <div class="menu-item">
-                <span class="name">柚子茶</span>
-                <span class="price">RM 10</span>
-            </div>
-        </div>
-        <footer>
-            © 2025 樱花居酒屋 | 日式料理の味
-        </footer>
+  <div class="bg" id="bg"></div>
+  <div class="overlay">
+    <header>
+      <h1 id="brand">小食代菜单</h1>
+      <p>日式料理の味 · Taste of Japan · Rasa Jepun</p>
+    </header>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="card">
+        <label>Language / 语言 / Bahasa：</label>
+        <select id="lang">
+          <option value="zh">中文</option>
+          <option value="en">English</option>
+          <option value="ms">Bahasa Melayu</option>
+        </select>
+        <label>Category：</label>
+        <select id="filterCategory"></select>
+        <button id="btnResetFilter" class="secondary">Show All</button>
+      </div>
+      <div class="card">
+        <button id="btnAdd">➕ Add Item / 添加</button>
+        <button id="btnCat">📂 Categories</button>
+        <button id="btnBg">🖼️ Backgrounds</button>
+        <button id="btnExport" class="secondary">⬇️ Export JSON</button>
+        <input id="importFile" type="file" accept="application/json" />
+        <button id="btnImport" class="secondary">⬆️ Import</button>
+        <button id="btnClear" class="danger">🗑️ Clear Data</button>
+      </div>
     </div>
+
+    <div class="menu" id="menu"></div>
+
+    <footer>© <span id="year"></span> 小食代手冲馆 | Sakura Izakaya | Dihasilkan dengan cinta 🍣</footer>
+  </div>
+
+  <script>
+  const $ = (sel, root=document) => root.querySelector(sel);
+  const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+  const LS_KEY = 'izakayaMenu_v1';
+  const DEFAULT = {
+    brand: '小食代菜单',
+    lang: 'zh',
+    categories: [
+      { id:'mains', zh:'主食', en:'Mains', ms:'Utama' },
+      { id:'drinks', zh:'饮品', en:'Drinks', ms:'Minuman' },
+    ],
+    items: [
+      { id:cryptoRandomId(), cat:'mains', price:45, zh:'寿司拼盘', en:'Sushi Platter', ms:'Papan Sushi', note:'12件精选寿司', img:'', available:true },
+      { id:cryptoRandomId(), cat:'mains', price:38, zh:'三文鱼刺身', en:'Salmon Sashimi', ms:'Sashimi Salmon', note:'200g', img:'', available:true },
+      { id:cryptoRandomId(), cat:'mains', price:22, zh:'照烧鸡肉饭', en:'Teriyaki Chicken Rice', ms:'Nasi Ayam Teriyaki', note:'', img:'', available:true },
+      { id:cryptoRandomId(), cat:'drinks', price:12, zh:'抹茶拿铁', en:'Matcha Latte', ms:'Latte Matcha', note:'热/冷', img:'', available:true },
+      { id:cryptoRandomId(), cat:'drinks', price:18, zh:'梅子酒', en:'Umeshu', ms:'Arak Ume', note:'18+', img:'', available:true },
+      { id:cryptoRandomId(), cat:'drinks', price:10, zh:'柚子茶', en:'Yuzu Tea', ms:'Teh Yuzu', note:'清新蜂蜜柚子', img:'', available:true },
+    ],
+    backgrounds: [
+      { url:'fuji.jpg', title:'富士山 · Mount Fuji' },
+      { url:'tokyo_tower.jpg', title:'东京塔 · Tokyo Tower' },
+      { url:'fushimi_inari.jpg', title:'伏见稻荷 · Fushimi Inari' },
+    ],
+    bgIntervalMs: 6000
+  };
+
+  function cryptoRandomId(){
+    if (window.crypto?.randomUUID) return crypto.randomUUID();
+    return 'id-' + Math.random().toString(36).slice(2,10);
+  }
+  function load(){
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) return structuredClone(DEFAULT);
+    try{ return JSON.parse(raw); }catch{ return structuredClone(DEFAULT); }
+  }
+  function save(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
+  let state = load();
+
+  function mountBackground(){
+    const bg = $('#bg'); bg.innerHTML='';
+    state.backgrounds.forEach((s,i)=>{
+      const img = document.createElement('img');
+      img.alt = s.title || '';
+      img.src = s.url;
+      if(i===0) img.classList.add('active');
+      bg.appendChild(img);
+    });
+    let idx=0; const imgs=$$('#bg img');
+    if(window.__bgTimer) clearInterval(window.__bgTimer);
+    window.__bgTimer = setInterval(()=>{
+      if(imgs.length===0) return; idx=(idx+1)%imgs.length;
+      imgs.forEach((im,i)=>im.classList.toggle('active', i===idx));
+    }, state.bgIntervalMs||6000);
+  }
+
+  function getCategoryLabel(cat){
+    const c = state.categories.find(c=>c.id===cat); if(!c) return cat;
+    const lang = $('#lang').value;
+    return c[lang]||c.zh||c.en||c.ms||c.id;
+  }
+  function i18nName(item){
+    const lang=$('#lang').value; return item[lang] || item.zh || item.en || item.ms || '—';
+  }
+  function renderFilters(){
+    const fc=$('#filterCategory'); fc.innerHTML='';
+    const optAll=document.createElement('option'); optAll.value=''; optAll.textContent='All / 全部'; fc.appendChild(optAll);
+    state.categories.forEach(c=>{
+      const o=document.createElement('option'); o.value=c.id; o.textContent=`${c.zh||c.en||c.ms} (${c.id})`; fc.appendChild(o);
+    });
+  }
+  function renderMenu(){
+    $('#brand').textContent = state.brand || '小食代菜单';
+    const wrap=$('#menu'); wrap.innerHTML='';
+    const activeCat=$('#filterCategory').value;
+    const cats = state.categories.slice();
+    cats.forEach(cat=>{
+      const items = state.items.filter(it=>it.cat===cat.id && (activeCat? it.cat===activeCat : true));
+      if(items.length===0) return;
+      const h=document.createElement('div'); h.className='category-title'; h.textContent=getCategoryLabel(cat.id); wrap.appendChild(h);
+      items.forEach(item=>{
+        const card=document.createElement('div'); card.className='card-item'; card.dataset.id=item.id;
+        const th=document.createElement('div'); th.className='thumb';
+        const im=document.createElement('img'); im.alt=i18nName(item);
+        if(item.img) im.src=item.img; else im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900"><rect width="100%" height="100%" fill="#eee"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="36" fill="#999">No Image</text></svg>`);
+        th.appendChild(im);
+        const badge=document.createElement('div'); badge.className='badge'; badge.textContent = item.available? 'AVAILABLE' : 'SOLD OUT'; th.appendChild(badge);
+        card.appendChild(th);
+        const ct=document.createElement('div'); ct.className='content';
+        const t=document.createElement('div'); t.className='title'; t.textContent=i18nName(item); ct.appendChild(t);
+        if(item.note){ const s=document.createElement('div'); s.className='subtitle'; s.textContent=item.note; ct.appendChild(s); }
+        const pr=document.createElement('div'); pr.className='price'; pr.textContent = `RM ${Number(item.price).toFixed(2)}`; ct.appendChild(pr);
+        const actions=document.createElement('div'); actions.className='actions';
+        const b1=document.createElement('button'); b1.className='edit'; b1.textContent='Edit / 编辑'; b1.onclick=()=>openItemModal(item.id);
+        const b2=document.createElement('button'); b2.className='delete'; b2.textContent='Delete / 删除'; b2.onclick=()=>deleteItem(item.id);
+        actions.appendChild(b1); actions.appendChild(b2); ct.appendChild(actions);
+        card.appendChild(ct);
+        wrap.appendChild(card);
+      });
+    });
+  }
+
+  $('#lang').value = state.lang || 'zh';
+  $('#lang').addEventListener('change', ()=>{ state.lang=$('#lang').value; save(); renderMenu(); });
+  $('#filterCategory').addEventListener('change', renderMenu);
+  $('#btnResetFilter').onclick=()=>{ $('#filterCategory').value=''; renderMenu(); };
+  $('#btnAdd').onclick=()=>alert('Add item modal not shown in this demo');
+  $('#btnBg').onclick=()=>alert('Background settings not shown in this demo');
+
+  $('#year').textContent = new Date().getFullYear();
+  renderFilters(); mountBackground(); renderMenu();
+  </script>
 </body>
 </html>
